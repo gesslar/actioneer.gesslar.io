@@ -61,27 +61,36 @@ not raw values. Each element of the array is one of:
 - `{status: "rejected", reason: <error>}` for a failed operation
 
 Your rejoiner must handle them accordingly — check each `status` manually, or
-lean on helpers from [`@gesslar/toolkit`](https://github.com/gesslar/toolkit):
+lean on the `Promised` helpers from
+[`@gesslar/toolkit`](https://github.com/gesslar/toolkit), which are built for
+exactly this shape of data:
 
 ```js
-import {Util} from "@gesslar/toolkit"
+import {Promised} from "@gesslar/toolkit"
 
 #rejoin = (originalCtx, settledResults) => {
   // settledResults is an array of settlement objects.
 
-  // Keep only the successful results
-  originalCtx.results = Util.fulfilledValues(settledResults)
+  // Keep only the successful values
+  originalCtx.results = Promised.values(settledResults)
 
   // Collect any failures
-  if (Util.anyRejected(settledResults)) {
-    originalCtx.errors = Util.rejectedReasons(
-      Util.settledAndRejected(settledResults)
-    )
+  if (Promised.hasRejected(settledResults)) {
+    originalCtx.errors = Promised.reasons(settledResults)
   }
 
   return originalCtx
 }
 ```
+
+:::note[Promised, not Util]
+The settled-result helpers live on `Promised`. Handy ones:
+`Promised.values(settled)` and `Promised.reasons(settled)` extract fulfilled
+values and rejection reasons; `Promised.fulfilled(settled)` /
+`Promised.rejected(settled)` return the filtered settlement objects;
+`Promised.hasFulfilled(settled)` / `Promised.hasRejected(settled)` are boolean
+checks.
+:::
 
 :::caution
 A naive rejoiner that does `splitResults.map(r => r.someField)` will read fields
