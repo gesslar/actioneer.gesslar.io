@@ -1,0 +1,79 @@
+---
+title: Actioneer
+description: A small, focused action orchestration library for Node.js and the browser. Compose activities into pipelines and run them concurrently with lifecycle hooks and control flow.
+template: splash
+hero:
+  tagline: The best action pipeline thingie this side of Tatooine — compose activities into pipelines and run them concurrently, in Node.js or the browser.
+  image:
+    alt: Actioneer logo
+    file: ../../assets/actioneer-512.png
+  actions:
+    - text: Get Started
+      link: /start/installation/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/gesslar/actioneer
+      icon: external
+      variant: minimal
+---
+
+import {Card, CardGrid, LinkCard} from "@astrojs/starlight/components"
+
+## What is Actioneer?
+
+Actioneer is a compact library for building **pipelines of work**. You describe
+your steps with a fluent builder, then hand the pipeline to a runner that
+executes it — either once, or concurrently across many inputs — with full
+control-flow semantics and lifecycle hooks along the way.
+
+```js
+import {ActionBuilder, ActionRunner} from "@gesslar/actioneer"
+
+class Doubler {
+  setup(builder) {
+    builder
+      .do("double", ctx => { ctx.result = ctx.input * 2 })
+      .done(ctx => ctx.result)
+  }
+}
+
+const runner = new ActionRunner(new ActionBuilder(new Doubler()))
+console.log(await runner.run({input: 5})) // 10
+```
+
+<CardGrid stagger>
+  <Card title="Fluent builder" icon="pencil">
+    Compose pipelines with a chainable `.do()` API. Each step receives a shared
+    context object it can read and mutate.
+  </Card>
+  <Card title="Concurrent runner" icon="rocket">
+    Run a single context with `run()`, or fan out across many with `pipe()` and
+    a configurable concurrency limit.
+  </Card>
+  <Card title="Real control flow" icon="random">
+    `WHILE`, `UNTIL`, `IF`, `BREAK`, `CONTINUE`, and `SPLIT` modes give you
+    loops, branches, and parallel sections inside a pipeline.
+  </Card>
+  <Card title="Lifecycle hooks" icon="setting">
+    Attach `before$` / `after$` hooks to any activity for logging, setup, and
+    cleanup — by file path or pre-instantiated object.
+  </Card>
+  <Card title="Environment-aware" icon="laptop">
+    Works in Node.js, browsers, and browser-like runtimes such as Tauri,
+    Electron, and Deno. The right variant is auto-detected.
+  </Card>
+  <Card title="No build step" icon="open-book">
+    Pure ES modules with shipped TypeScript declarations. Import from a CDN in
+    the browser or from npm in Node.js.
+  </Card>
+</CardGrid>
+
+## Next steps
+
+<CardGrid>
+  <LinkCard title="Installation" href="/start/installation/" description="Install from npm or import from a CDN." />
+  <LinkCard title="Quick Start" href="/start/quick-start/" description="Build and run your first pipeline in a few lines." />
+  <LinkCard title="Core Concepts" href="/start/concepts/" description="Actions, builders, contexts, activities, and runners." />
+  <LinkCard title="Activity Modes" href="/guides/activity-modes/" description="The six execution modes and when to reach for each." />
+</CardGrid>
