@@ -7,7 +7,7 @@ Actioneer is published to npm as **`@gesslar/actioneer`**. It ships as pure ES
 modules with TypeScript declarations and has no build step.
 
 :::note[Requirements]
-The Node.js variant targets **Node 24.11+**. The browser variant runs in any
+The Node.js variant targets **Node 24+**. The browser variant runs in any
 modern browser and browser-like runtime (Tauri, Electron, Deno).
 :::
 
