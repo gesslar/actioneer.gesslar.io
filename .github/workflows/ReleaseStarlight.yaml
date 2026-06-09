@@ -1,4 +1,4 @@
-name: Release Starlight
+name: Release
 
 on:
   push:
