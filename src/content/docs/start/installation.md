@@ -52,7 +52,7 @@ No install required — import directly from a CDN.
 
 ```html
 <script type="module">
-  import {ActionBuilder, ActionRunner} from "https://cdn.jsdelivr.net/npm/@gesslar/actioneer"
+  import {ActionBuilder, ActionRunner} from "https://cdn.jsdelivr.net/npm/@gesslar/actioneer/+esm"
 </script>
 ```
 

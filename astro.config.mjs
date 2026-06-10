@@ -35,6 +35,9 @@ export default defineConfig({
           href: "https://github.com/gesslar/actioneer",
         },
       ],
+      components: {
+        SocialIcons: "./src/components/SocialIcons.astro",
+      },
       lastUpdated: true,
       sidebar: [
         {
@@ -66,6 +69,12 @@ export default defineConfig({
             {label: "Activity & ACTIVITY", slug: "reference/activity"},
             {label: "ActionHooks", slug: "reference/action-hooks"},
             {label: "Piper", slug: "reference/piper"},
+          ],
+        },
+        {
+          label: "More",
+          items: [
+            {slug: "testimonials"},
           ],
         },
       ],
