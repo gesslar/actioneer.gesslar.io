@@ -19,8 +19,8 @@ class MyAction {
 
   setup(builder) {
     builder
-      .do("load", ctx => { ctx.ready = true })
-      .do("guard", ACTIVITY.IF, this.#isReady, ctx => { /* ... */ })
+      .do("load", ctx => { ctx.ready = true; return ctx })
+      .do("guard", ACTIVITY.IF, this.#isReady, ctx => { /* ... */ return ctx })
   }
 }
 ```
@@ -40,22 +40,23 @@ The **builder** is the fluent API you compose pipelines with. Its core method is
 const builder = new ActionBuilder(new MyAction())
 ```
 
-Constructing a builder with an action immediately calls that action's `setup()`,
-so the pipeline is fully described by the time the constructor returns.
+The action's `setup()` runs when the runner **builds** the pipeline — lazily, on
+the first `run()`/`pipe()` — not in the `ActionBuilder` constructor.
 
 See the [ActionBuilder reference](/reference/action-builder/) for every method.
 
 ## Context
 
 The **context** is a plain object threaded through every activity. It is your
-pipeline's shared state. Operations read from it and mutate it in place; the
-final value returned (or the value `ctx` holds) is what the runner gives back.
+pipeline's shared state. Operations read from it and mutate it in place, then
+**return it** so it flows to the next step — a step that returns nothing passes
+`undefined` forward. The final value returned is what the runner gives back.
 
 ```js
 builder
-  .do("a", ctx => { ctx.x = 1 })       // write
-  .do("b", ctx => { ctx.y = ctx.x + 1 }) // read + write
-  .do("c", ctx => ctx.y)                 // return the result
+  .do("a", ctx => { ctx.x = 1; return ctx })        // write
+  .do("b", ctx => { ctx.y = ctx.x + 1; return ctx }) // read + write
+  .do("c", ctx => ctx.y)                             // return the result
 ```
 
 Each invocation of the pipeline gets its own context. When you call

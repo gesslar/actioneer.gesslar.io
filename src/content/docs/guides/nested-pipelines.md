@@ -28,7 +28,7 @@ import {ActionBuilder, ACTIVITY} from "@gesslar/actioneer"
 class Worker {
   setup(builder) {
     builder
-      .do("init", ctx => { ctx.count = 0; ctx.out = [] })
+      .do("init", ctx => { ctx.count = 0; ctx.out = []; return ctx })
       .do("loop", ACTIVITY.WHILE, ctx => ctx.count < 10,
         new ActionBuilder()
           .do("increment", ctx => { ctx.count++; return ctx })
@@ -51,27 +51,33 @@ For [`SPLIT`](/guides/split/), the operation can be a nested builder so each
 parallel task runs its own sequence of steps:
 
 ```js
+import {Promised} from "@gesslar/toolkit"
+
 class NestedParallel {
   #split = ctx => ctx.batches.map(batch => ({batch}))
 
-  #rejoin = (original, results) => {
-    original.processed = results.flatMap(r => r.batch)
+  #rejoin = (original, settledResults) => {
+    // SPLIT rejoiners receive settlement objects — go through .value
+    original.processed = Promised.values(settledResults).flatMap(r => r.batch)
     return original
   }
 
   setup(builder) {
     builder
       .do("parallel", ACTIVITY.SPLIT, this.#split, this.#rejoin,
-        new ActionBuilder(this)
-          .do("step1", ctx => { /* ... */ })
-          .do("step2", ctx => { /* ... */ })
+        new ActionBuilder()
+          .do("step1", ctx => { /* ... */ return ctx })
+          .do("step2", ctx => { /* ... */ return ctx })
       )
   }
 }
 ```
 
-Passing `this` to the nested `ActionBuilder` (`new ActionBuilder(this)`) lets the
-sub-pipeline share the parent action instance.
+Construct the nested builder **empty** (`new ActionBuilder()`). The runner
+injects the parent action into it automatically, so `this` inside the nested
+operations is the parent action instance. Do _not_ pass `this`
+(`new ActionBuilder(this)`): an action already consumed by a builder cannot be
+reused, so that throws.
 
 ## Inherited behavior
 
@@ -79,24 +85,29 @@ Nested builders don't run in isolation — they inherit context from their paren
 
 - **Hooks flow down.** A parent's [hooks](/guides/hooks/) are automatically
   passed to all nested builders, so observability is consistent throughout.
-- **`done()` does not flow down.** A top-level [`done()`](/guides/done/) callback
-  runs only for the outermost pipeline (loops), or once per split (SPLIT) — not
-  for nested loop bodies.
+- **`done()` does not flow down — except under SPLIT.** A nested builder's
+  [`done()`](/guides/done/) does not run when the builder is a `WHILE`/`UNTIL`
+  loop body. The exception is a nested builder used as a `SPLIT` operation: each
+  split runs as an independent execution, so its `done()` fires once per split
+  context. The outer pipeline's own `done()` always runs exactly once.
 
 ## Constructing nested builders
 
 You can build nested pipelines two ways:
 
 ```js
-// Empty builder — add activities directly
+// Empty builder — the runner injects the parent action, so `this` inside
+// these operations is the parent action instance
 new ActionBuilder()
   .do("a", ctx => { /* ... */ return ctx })
   .do("b", ctx => { /* ... */ return ctx })
 
-// Bound to an action instance — share methods and `this`
-new ActionBuilder(this)
+// Bound to a separate action instance — use its methods and `this`
+new ActionBuilder(otherAction)
   .do("a", ctx => { /* ... */ return ctx })
 ```
 
 Both forms are valid as the operation of a `WHILE`, `UNTIL`, or `SPLIT`
-activity.
+activity. Do not pass the current action with `new ActionBuilder(this)` — it has
+already been consumed by the outer builder, and reusing it throws. Use the empty
+form to reach the parent action's `this`, or bind a different, unconsumed action.

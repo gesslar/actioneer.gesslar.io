@@ -77,7 +77,7 @@ https://esm.sh/@gesslar/actioneer?dts
   class MyAction {
     setup(builder) {
       builder
-        .do("step1", ctx => { ctx.result = ctx.input * 2 })
+        .do("step1", ctx => { ctx.result = ctx.input * 2; return ctx })
         .do("step2", ctx => { return ctx.result })
     }
   }

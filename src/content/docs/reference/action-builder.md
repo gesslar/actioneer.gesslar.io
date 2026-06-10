@@ -20,7 +20,7 @@ new ActionBuilder(action?, config?)
 
 | Parameter | Type | Description |
 | --------- | ---- | ----------- |
-| `action` | `object` _(optional)_ | An action instance with a `setup(builder)` method. If provided, `setup()` is called immediately to populate the pipeline. |
+| `action` | `object` _(optional)_ | An action instance with a `setup(builder)` method. If provided, its `setup(builder)` runs when the pipeline is built — lazily, on the first `run()`/`pipe()` — to populate the pipeline. |
 | `config` | `object` _(optional)_ | Options: `{tag?, debug?}`. |
 
 ```js

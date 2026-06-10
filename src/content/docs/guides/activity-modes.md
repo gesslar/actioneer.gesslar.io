@@ -1,6 +1,6 @@
 ---
 title: Activity Modes
-description: The six execution modes — Default, WHILE, UNTIL, IF, BREAK, CONTINUE, and SPLIT — and when to use each.
+description: The seven execution modes — Default, WHILE, UNTIL, IF, BREAK, CONTINUE, and SPLIT — and when to use each.
 ---
 
 Every activity you add with `.do()` runs in one of several **modes**. The mode
@@ -12,9 +12,9 @@ import {ActionBuilder, ACTIVITY} from "@gesslar/actioneer"
 ```
 
 :::caution[One mode per activity]
-Each activity can have exactly one mode. Combining modes throws an error. To
-compose behaviors, use separate activities — often inside a
-[nested builder](/guides/nested-pipelines/).
+Each activity has exactly one mode — a single `ACTIVITY` value passed to `.do()`,
+with no way to combine them. To compose behaviors, use separate activities —
+often inside a [nested builder](/guides/nested-pipelines/).
 :::
 
 ## Execute once (default)
@@ -27,6 +27,8 @@ class MyAction {
   setup(builder) {
     builder.do("processItem", ctx => {
       ctx.result = ctx.input * 2
+
+      return ctx
     })
   }
 }
@@ -42,11 +44,11 @@ import {ActionBuilder, ACTIVITY} from "@gesslar/actioneer"
 
 class CounterAction {
   #shouldContinue = ctx => ctx.count < 10
-  #increment = ctx => { ctx.count += 1 }
+  #increment = ctx => { ctx.count += 1; return ctx }
 
   setup(builder) {
     builder
-      .do("initialize", ctx => { ctx.count = 0 })
+      .do("initialize", ctx => { ctx.count = 0; return ctx })
       .do("countUp", ACTIVITY.WHILE, this.#shouldContinue, this.#increment)
       .do("finish", ctx => { return ctx.count })
   }
@@ -69,6 +71,8 @@ class ProcessorAction {
   #processItem = ctx => {
     const item = ctx.queue.shift()
     ctx.processed.push(item)
+
+    return ctx
   }
 
   setup(builder) {
@@ -76,6 +80,8 @@ class ProcessorAction {
       .do("initialize", ctx => {
         ctx.queue = [1, 2, 3, 4, 5]
         ctx.processed = []
+
+        return ctx
       })
       .do("process", ACTIVITY.UNTIL, this.#queueIsEmpty, this.#processItem)
       .do("finish", ctx => { return ctx.processed })
@@ -100,11 +106,11 @@ import {ActionBuilder, ACTIVITY} from "@gesslar/actioneer"
 
 class ConditionalAction {
   #shouldProcess = ctx => ctx.value > 10
-  #processLargeValue = ctx => { ctx.processed = ctx.value * 2 }
+  #processLargeValue = ctx => { ctx.processed = ctx.value * 2; return ctx }
 
   setup(builder) {
     builder
-      .do("initialize", ctx => { ctx.value = 15 })
+      .do("initialize", ctx => { ctx.value = 15; return ctx })
       .do("maybeProcess", ACTIVITY.IF, this.#shouldProcess, this.#processLargeValue)
       .do("finish", ctx => { return ctx })
   }

@@ -29,7 +29,7 @@ new ActionHooks({actionKind, hooksFile?, hooks?, hookTimeout?, debug?})
 | Option | Type | Default | Description |
 | ------ | ---- | ------- | ----------- |
 | `actionKind` | `string` | — | Action identifier shared between runner and hooks (the exported hooks class name). |
-| `hooksFile` | `FileObject` _(Node.js)_ | — | File handle used to import the hooks module. |
+| `hooksFile` | `string` _(path, Node.js)_ | — | Path to the hooks module to import. |
 | `hooks` | `object` | — | A pre-instantiated hooks object. |
 | `hookTimeout` | `number` | `1000` | Per-hook timeout in milliseconds. |
 | `debug` | `function` | — | Logger function for diagnostics. |
@@ -56,8 +56,9 @@ const hooks = await ActionHooks.new({
 }, console.log)
 ```
 
-Throws a `Sass` error if the hooks file does not exist or does not export the
-named class.
+Throws a `Sass` error if the hooks file does not exist. If the file exists but
+does not export the named class (or fails to import), `.new` resolves to `null`
+rather than throwing.
 
 ## Hook timeout
 

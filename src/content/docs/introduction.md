@@ -23,7 +23,7 @@ Actioneer packages that machinery into a small, declarative API:
 
 - **Describe steps, not plumbing.** Each step is an _activity_ added with
   `.do(name, operation)`. Operations receive a shared **context** object they
-  read from and write to.
+  read from and write to, and return it to pass it to the next step.
 - **Control flow is first-class.** Loops, conditionals, early exits, and
   parallel sections are activity _modes_ — not ad-hoc `for` loops scattered
   through your code. See [Activity Modes](/guides/activity-modes/).

@@ -18,15 +18,17 @@ import {ActionBuilder, ActionRunner} from "@gesslar/actioneer"
 class MyAction {
   setup(builder) {
     builder
-      .do("prepare", ctx => { ctx.count = 0 })
-      .do("work", ctx => { ctx.count += 1 })
+      .do("prepare", ctx => { ctx.count = 0; return ctx })
+      .do("work", ctx => { ctx.count += 1; return ctx })
       .do("finalise", ctx => { return ctx.count })
   }
 }
 ```
 
-The operation for each activity reads from and mutates `ctx`. Whatever the final
-activity returns becomes the pipeline's result.
+The operation for each activity reads from and mutates `ctx`, then **returns it**
+so the updated context flows to the next step — return nothing and the next step
+receives `undefined`. Whatever the final activity returns becomes the pipeline's
+result.
 
 ## 2. Build and run it
 
@@ -74,15 +76,16 @@ failing context never blows up the whole batch. See
 ## 4. Add a finalizer
 
 The `done()` callback runs after every activity completes — even on error — much
-like `finally`. Whatever it returns becomes the final result, which makes it
-ideal for cleanup or shaping output:
+like `finally`. On success its return value becomes the final result (on error
+it receives the error and the pipeline still rejects), which makes it ideal for
+cleanup or shaping output:
 
 ```js
 class MyAction {
   setup(builder) {
     builder
-      .do("step1", ctx => { ctx.a = 1 })
-      .do("step2", ctx => { ctx.b = 2 })
+      .do("step1", ctx => { ctx.a = 1; return ctx })
+      .do("step2", ctx => { ctx.b = 2; return ctx })
       .done(ctx => ({total: ctx.a + ctx.b}))
   }
 }

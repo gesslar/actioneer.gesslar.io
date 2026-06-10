@@ -27,6 +27,7 @@ class BreakExample {
       .do("initialize", ctx => {
         ctx.count = 0
         ctx.items = []
+        return ctx
       })
       .do("loop", ACTIVITY.WHILE, ctx => ctx.count < 100,
         new ActionBuilder()
@@ -61,6 +62,7 @@ class ContinueExample {
       .do("initialize", ctx => {
         ctx.count = 0
         ctx.processed = []
+        return ctx
       })
       .do("loop", ACTIVITY.WHILE, ctx => ctx.count < 5,
         new ActionBuilder()
@@ -94,6 +96,7 @@ class CombinedExample {
       .do("initialize", ctx => {
         ctx.count = 0
         ctx.results = []
+        return ctx
       })
       .do("loop", ACTIVITY.WHILE, ctx => ctx.count < 100,
         new ActionBuilder()

@@ -48,8 +48,9 @@ const result = await runner.run({input: "data"})
 
 **Throws:**
 
-- `Sass` — when no activities are registered, conflicting activity kinds are
-  used, or execution fails.
+- `Sass` — when an activity errors, or for invalid pipeline usage such as
+  `BREAK`/`CONTINUE` outside a loop or a `SPLIT` missing its splitter/rejoiner.
+  (An empty pipeline does not throw — it returns the seed context unchanged.)
 - `Tantrum` — when both an activity and the `done()` callback fail.
 
 Use `run()` for single contexts and traditional `try/catch` error handling. See

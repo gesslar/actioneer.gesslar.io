@@ -33,7 +33,7 @@ import {ActionBuilder, ActionRunner} from "@gesslar/actioneer"
 class Doubler {
   setup(builder) {
     builder
-      .do("double", ctx => { ctx.result = ctx.input * 2 })
+      .do("double", ctx => { ctx.result = ctx.input * 2; return ctx })
       .done(ctx => ctx.result)
   }
 }
