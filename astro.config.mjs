@@ -10,7 +10,6 @@ export default defineConfig({
       title: "Actioneer",
       description:
         "A small, focused action orchestration library for Node.js and the browser. Compose activities into pipelines and run them concurrently with lifecycle hooks and control flow.",
-      tagline: "Action pipelines for Node.js and the browser.",
       logo: {
         src: "./src/assets/actioneer.svg",
         alt: "Actioneer",
